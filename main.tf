@@ -4,7 +4,7 @@
 // Using pessimistic version locking for all versions
 // ----------------------------------------------------------------------------
 terraform {
-  required_version = ">= 0.12.0, < 0.15"
+  required_version = ">= 0.12.0, <= 1.0.3"
 }
 
 // ----------------------------------------------------------------------------
@@ -173,9 +173,9 @@ module "cluster" {
   jx2          = var.jx2
   content      = local.content
 
-  jx_git_url      = var.jx_git_url
-  jx_bot_username = var.jx_bot_username
-  jx_bot_token    = var.jx_bot_token
+  jx_git_url              = var.jx_git_url
+  jx_bot_username         = var.jx_bot_username
+  jx_bot_token            = var.jx_bot_token
   jx_git_operator_version = var.jx_git_operator_version
 
   kuberhealthy = var.kuberhealthy
@@ -186,7 +186,7 @@ module "cluster" {
 // See https://github.com/banzaicloud/bank-vaults
 // ----------------------------------------------------------------------------
 module "vault" {
-  count  = ! var.gsm ? 1 : 0
+  count  = !var.gsm ? 1 : 0
   source = "./modules/vault"
 
   gcp_project         = var.gcp_project
@@ -204,7 +204,7 @@ module "vault" {
 // See https://cloud.google.com/secret-manager
 // ----------------------------------------------------------------------------
 module "gsm" {
-  count  = var.gsm && ! var.jx2 ? 1 : 0
+  count  = var.gsm && !var.jx2 ? 1 : 0
   source = "./modules/gsm"
 
   gcp_project  = var.gcp_project
@@ -257,7 +257,7 @@ module "dns" {
 module "jx-boot" {
   source        = "./modules/jx-boot"
   depends_on    = [module.cluster]
-  install_vault = ! var.gsm ? true : false
+  install_vault = !var.gsm ? true : false
 }
 
 // ----------------------------------------------------------------------------
@@ -285,7 +285,7 @@ locals {
     vault_name      = length(module.vault) > 0 ? module.vault[0].vault_name : ""
     vault_sa        = length(module.vault) > 0 ? module.vault[0].vault_sa : ""
     vault_url       = var.vault_url
-    vault_installed = ! var.gsm ? true : false
+    vault_installed = !var.gsm ? true : false
     // Velero
     enable_backup    = var.enable_backup
     velero_sa        = module.backup.velero_sa
